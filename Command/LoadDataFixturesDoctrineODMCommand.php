@@ -63,19 +63,20 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb')->getManager($input->getOption('dm'));
+        $container = $this->getContainer();
+        $dm = $container->get('doctrine_mongodb')->getManager($input->getOption('dm'));
         $dirOrFile = $input->getOption('fixtures');
         if ($dirOrFile) {
             $paths = is_array($dirOrFile) ? $dirOrFile : array($dirOrFile);
         } else {
-            $paths = $this->getContainer()->getParameter('doctrine_mongodb.odm.fixtures_dirs');
+            $paths = $container->getParameter('doctrine_mongodb.odm.fixtures_dirs');
             $paths = is_array($paths) ? $paths : array($paths);
-            foreach ($this->getContainer()->get('kernel')->getBundles() as $bundle) {
+            foreach ($container->get('kernel')->getBundles() as $bundle) {
                 $paths[] = $bundle->getPath().'/DataFixtures/MongoDB';
             }
         }
 
-        $loader = new ContainerAwareLoader($this->getContainer());
+        $loader = new ContainerAwareLoader($container);
         foreach ($paths as $path) {
             if (is_dir($path)) {
                 $loader->loadFromDirectory($path);
